@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-black text-white antialiased;
+  }
+}
+
+@layer components {
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-black bg-gold-gradient transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-gold-500/25 active:scale-95;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-gold-500 border border-gold-500 transition-all duration-200 hover:bg-gold-500/10 active:scale-95;
+  }
+  .card-dark {
+    @apply bg-black-700 border border-white/10 rounded-2xl;
+  }
+  .gold-text {
+    @apply text-transparent bg-clip-text bg-gold-gradient;
+  }
+  .input-dark {
+    @apply w-full px-4 py-3 rounded-lg bg-black-600 border border-white/10 text-white placeholder-white/40 focus:outline-none focus:border-gold-500 transition-colors;
+  }
+  .section-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #111; }
+::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 3px; }
+
+/* Gold shimmer animation */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.shimmer {
+  background: linear-gradient(90deg, #D4AF37 25%, #FFD700 50%, #D4AF37 75%);
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+}
