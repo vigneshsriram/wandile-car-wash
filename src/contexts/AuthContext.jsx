@@ -25,11 +25,10 @@ export function AuthProvider({ children }) {
   }, [])
 
   async function fetchProfile(userId) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
+    // Ensure profile row exists — trigger only fires on first sign-up,
+    // not when users sign back in after data was wiped.
+    await supabase.from('profiles').upsert({ id: userId }, { ignoreDuplicates: true })
+    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single()
     setProfile(data)
   }
 
