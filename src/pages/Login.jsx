@@ -116,6 +116,10 @@ export default function Login() {
           Don't have an account?{' '}
           <Link to="/signup" className="text-gold-500 hover:text-gold-400 font-medium">Sign up free</Link>
         </p>
+        <p className="text-center text-xs text-white/50 mt-3">
+          Staff?{' '}
+          <Link to="/admin" className="text-electric-400 hover:text-electric-300 font-medium transition-colors">Admin Portal →</Link>
+        </p>
       </div>
     </div>
   )

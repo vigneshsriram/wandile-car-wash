@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { PACKAGES, ADD_ONS } from '../../lib/packages'
+import toast from 'react-hot-toast'
 
 const STATUS_CONFIG = {
   confirmed: { label: 'Confirmed', icon: CheckCircle, color: 'text-green-400', bg: 'bg-green-400/10' },
@@ -19,6 +20,21 @@ export default function HistoryLog() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => { fetchData() }, [])
+
+  async function cancelAppointment(id) {
+    if (!window.confirm('Cancel this appointment?')) return
+    const { error } = await supabase
+      .from('appointments')
+      .update({ status: 'cancelled' })
+      .eq('id', id)
+      .eq('user_id', user.id)
+    if (error) {
+      toast.error('Failed to cancel')
+    } else {
+      toast.success('Appointment cancelled')
+      setAppointments(prev => prev.map(a => a.id === id ? { ...a, status: 'cancelled' } : a))
+    }
+  }
 
   async function fetchData() {
     setLoading(true)
@@ -71,7 +87,9 @@ export default function HistoryLog() {
           <div className="mb-8">
             <h2 className="text-lg font-semibold text-white mb-4">Upcoming</h2>
             <div className="space-y-3">
-              {upcoming.map(a => <AppointmentRow key={a.id} a={a} />)}
+              {upcoming.map(a => (
+                <AppointmentRow key={a.id} a={a} onCancel={['pending','confirmed'].includes(a.status) ? cancelAppointment : null} />
+              ))}
             </div>
           </div>
         )}
@@ -96,7 +114,7 @@ export default function HistoryLog() {
   )
 }
 
-function AppointmentRow({ a }) {
+function AppointmentRow({ a, onCancel }) {
   const pkg = PACKAGES.find(p => p.id === a.package_id)
   const status = STATUS_CONFIG[a.status] || STATUS_CONFIG.pending
   const StatusIcon = status.icon
@@ -124,6 +142,14 @@ function AppointmentRow({ a }) {
         </div>
         {addons.length > 0 && (
           <p className="text-xs text-white/30 mt-1.5">+ {addons.join(', ')}</p>
+        )}
+        {onCancel && (
+          <button
+            onClick={() => onCancel(a.id)}
+            className="mt-2 text-xs text-red-400 hover:text-red-300 transition-colors"
+          >
+            Cancel appointment
+          </button>
         )}
       </div>
     </div>

@@ -11,6 +11,9 @@ import Dashboard from './pages/Dashboard'
 import VehicleGarage from './pages/dashboard/VehicleGarage'
 import BillingPortal from './pages/dashboard/BillingPortal'
 import HistoryLog from './pages/dashboard/HistoryLog'
+import AdminPortal from './pages/admin/AdminPortal'
+
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -20,6 +23,18 @@ function ProtectedRoute({ children }) {
     </div>
   )
   return user ? children : <Navigate to="/login" replace />
+}
+
+function AdminRoute({ children }) {
+  const { user, loading } = useAuth()
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-electric-400 border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
+  if (!user) return <Navigate to="/login" replace />
+  if (user.email !== ADMIN_EMAIL) return <Navigate to="/" replace />
+  return children
 }
 
 export default function App() {
@@ -37,6 +52,7 @@ export default function App() {
           <Route path="/dashboard/vehicles" element={<ProtectedRoute><VehicleGarage /></ProtectedRoute>} />
           <Route path="/dashboard/billing" element={<ProtectedRoute><BillingPortal /></ProtectedRoute>} />
           <Route path="/dashboard/history" element={<ProtectedRoute><HistoryLog /></ProtectedRoute>} />
+          <Route path="/admin" element={<AdminRoute><AdminPortal /></AdminRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

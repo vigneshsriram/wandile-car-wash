@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Car, CreditCard, History, Star, QrCode, Calendar, ChevronRight } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
+import toast from 'react-hot-toast'
 import { QRCodeSVG } from 'qrcode.react'
 import { PACKAGES } from '../lib/packages'
 
@@ -19,6 +20,21 @@ export default function Dashboard() {
       fetchData()
     }
   }, [user])
+
+  async function cancelAppointment(id) {
+    if (!window.confirm('Cancel this appointment?')) return
+    const { error } = await supabase
+      .from('appointments')
+      .update({ status: 'cancelled' })
+      .eq('id', id)
+      .eq('user_id', user.id)
+    if (error) {
+      toast.error('Failed to cancel appointment')
+    } else {
+      toast.success('Appointment cancelled')
+      setNextAppt(null)
+    }
+  }
 
   async function fetchData() {
     const [{ data: v }, { data: a }, { data: l }, { data: s }] = await Promise.all([
@@ -128,7 +144,10 @@ export default function Dashboard() {
                   <span className="text-white/50">Package: </span>
                   <span className="text-gold-500 font-medium">{PACKAGES.find(p => p.id === nextAppt.package_id)?.name}</span>
                 </div>
-                <button className="mt-4 text-xs text-red-400 hover:text-red-300 transition-colors">
+                <button
+                  onClick={() => cancelAppointment(nextAppt.id)}
+                  className="mt-4 text-xs text-red-400 hover:text-red-300 transition-colors"
+                >
                   Cancel appointment
                 </button>
               </div>

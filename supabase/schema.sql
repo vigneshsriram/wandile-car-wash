@@ -136,3 +136,27 @@ create policy "payments: own read" on public.payments for select using (auth.uid
 
 -- Loyalty Points
 create policy "loyalty: own data" on public.loyalty_points for all using (auth.uid() = user_id);
+
+-- ── Admin Policies ────────────────────────────────────────
+-- Run these in the Supabase SQL Editor to enable the admin portal.
+-- Replace 'YOUR_ADMIN_EMAIL' with your actual admin email.
+
+create policy "admin: read all appointments" on public.appointments
+  for select using (
+    (select email from auth.users where id = auth.uid()) = 'YOUR_ADMIN_EMAIL'
+  );
+
+create policy "admin: update all appointments" on public.appointments
+  for update using (
+    (select email from auth.users where id = auth.uid()) = 'YOUR_ADMIN_EMAIL'
+  );
+
+create policy "admin: read all profiles" on public.profiles
+  for select using (
+    (select email from auth.users where id = auth.uid()) = 'YOUR_ADMIN_EMAIL'
+  );
+
+create policy "admin: read all vehicles" on public.vehicles
+  for select using (
+    (select email from auth.users where id = auth.uid()) = 'YOUR_ADMIN_EMAIL'
+  );
