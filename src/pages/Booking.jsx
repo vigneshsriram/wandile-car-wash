@@ -36,8 +36,19 @@ export default function Booking() {
   const [selectedDate, setSelectedDate] = useState(null)
   const [selectedTime, setSelectedTime] = useState(null)
 
-  // Simulate some busy slots
-  const busySlots = new Set(['08:00', '09:30', '11:00', '14:00', '16:00'])
+  const [busySlots, setBusySlots] = useState(new Set())
+  const [loadingSlots, setLoadingSlots] = useState(false)
+
+  useEffect(() => {
+    if (selectedDate) fetchBusySlots(selectedDate)
+  }, [selectedDate])
+
+  async function fetchBusySlots(date) {
+    setLoadingSlots(true)
+    const { data } = await supabase.rpc('get_busy_slots', { check_date: date })
+    setBusySlots(new Set(data || []))
+    setLoadingSlots(false)
+  }
 
   useEffect(() => {
     if (user) fetchVehicles()
@@ -217,7 +228,10 @@ export default function Booking() {
               {/* Time slots */}
               {selectedDate && (
                 <div>
-                  <p className="text-sm text-white/60 mb-3 flex items-center gap-2"><Clock size={14} /> Available time slots</p>
+                  <p className="text-sm text-white/60 mb-3 flex items-center gap-2">
+                    <Clock size={14} /> Available time slots
+                    {loadingSlots && <span className="w-3 h-3 border border-gold-500 border-t-transparent rounded-full animate-spin" />}
+                  </p>
                   <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
                     {TIMES.map(t => {
                       const busy = busySlots.has(t)
