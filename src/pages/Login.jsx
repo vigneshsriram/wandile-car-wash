@@ -21,7 +21,8 @@ export default function Login() {
     try {
       await signIn({ email, password })
       toast.success('Welcome back!')
-      navigate(from, { replace: true })
+      const dest = email === import.meta.env.VITE_ADMIN_EMAIL ? '/admin' : from
+      navigate(dest, { replace: true })
     } catch (err) {
       toast.error(err.message || 'Invalid credentials')
     } finally {

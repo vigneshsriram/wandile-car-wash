@@ -27,10 +27,13 @@ export default function Navbar() {
     }
   }
 
+  const isAdmin = user?.email === import.meta.env.VITE_ADMIN_EMAIL
+
   const navLinks = [
     { to: '/', label: 'Home' },
     { to: '/packages', label: 'Packages' },
     { to: '/book', label: 'Book Now' },
+    ...(isAdmin ? [{ to: '/admin', label: 'Admin Portal' }] : []),
   ]
 
   return (
@@ -57,7 +60,9 @@ export default function Navbar() {
                 key={to}
                 to={to}
                 className={({ isActive }) =>
-                  `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'text-gold-500 bg-gold-500/10' : 'text-white/70 hover:text-white hover:bg-white/5'}`
+                  to === '/admin'
+                    ? `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'text-electric-400 bg-electric-500/15' : 'text-electric-400/80 hover:text-electric-400 hover:bg-electric-500/10'}`
+                    : `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'text-gold-500 bg-gold-500/10' : 'text-white/70 hover:text-white hover:bg-white/5'}`
                 }
               >
                 {label}
@@ -114,7 +119,9 @@ export default function Navbar() {
               to={to}
               onClick={() => setOpen(false)}
               className={({ isActive }) =>
-                `block px-4 py-3 rounded-lg text-sm font-medium ${isActive ? 'text-gold-500 bg-gold-500/10' : 'text-white/70'}`
+                to === '/admin'
+                  ? `block px-4 py-3 rounded-lg text-sm font-medium ${isActive ? 'text-electric-400 bg-electric-500/15' : 'text-electric-400/80'}`
+                  : `block px-4 py-3 rounded-lg text-sm font-medium ${isActive ? 'text-gold-500 bg-gold-500/10' : 'text-white/70'}`
               }
             >
               {label}
