@@ -144,7 +144,7 @@ export default function Home() {
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6">
           <h1 className="mt-8 font-display text-5xl sm:text-6xl md:text-7xl font-bold leading-tight">
             Your Car Deserves<br />
-            <span className="gold-text">the Royal Treatment</span>
+            <span className="gold-text">the Wandile Treatment</span>
           </h1>
           <p className="mt-6 text-lg text-electric-300/80 max-w-2xl mx-auto leading-relaxed">
             From quick exterior washes to full ceramic detailing — Wandile Car Wash delivers showroom-quality results every single time.
