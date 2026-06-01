@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { Menu, X, Droplets, User, LogOut, ChevronDown } from 'lucide-react'
+import { Menu, X, User, LogOut, ChevronDown } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import toast from 'react-hot-toast'
 
@@ -34,17 +34,19 @@ export default function Navbar() {
   ]
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-black/95 backdrop-blur-md shadow-lg shadow-black/50 border-b border-white/5' : 'bg-transparent'}`}>
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-black-800/95 backdrop-blur-md shadow-lg shadow-black/60 border-b border-electric-500/15' : 'bg-transparent'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-lg bg-gold-gradient flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Droplets size={20} className="text-black" />
-            </div>
-            <span className="font-display text-xl font-semibold">
+          <Link to="/" className="flex items-center gap-3 group">
+            <img
+              src="/logo.png"
+              alt="Wandile Car Wash"
+              className="h-10 md:h-12 w-auto group-hover:scale-105 transition-transform"
+            />
+            <span className="font-display text-lg md:text-xl font-semibold leading-tight">
               <span className="gold-text">Wandile</span>
-              <span className="text-white/80 ml-1 text-sm font-sans font-normal">Car Wash</span>
+              <span className="block text-white/80 text-xs md:text-sm font-sans font-normal tracking-widest uppercase">Car Wash</span>
             </span>
           </Link>
 

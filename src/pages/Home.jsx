@@ -1,13 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { Clock, MapPin, Star, ChevronRight, Shield, Zap, Award, Droplets } from 'lucide-react'
+import { MapPin, Star, ChevronRight, Shield, Zap, Award, Droplets } from 'lucide-react'
 import PackageCard from '../components/PackageCard'
 import { PACKAGES } from '../lib/packages'
 
 const REVIEWS = [
-  { name: 'Sipho M.', stars: 5, text: 'Best car wash in Joburg. The ceramic detail package left my BMW looking showroom-fresh for weeks!', date: '2 weeks ago' },
-  { name: 'Amara T.', stars: 5, text: 'Love the subscription model. I pay once a month and drive through whenever — such a time saver.', date: '1 month ago' },
-  { name: 'David K.', stars: 5, text: 'Ultimate Shield is my go-to. The Rain-X treatment is worth it alone during the rainy season.', date: '3 weeks ago' },
+  { name: 'Vignesh Sriram', stars: 5, text: 'Incredibly thorough job — my car looked brand new after the ceramic detail. Highly recommend!', date: '1 week ago' },
+  { name: 'Trupti Jadhav', stars: 5, text: 'Super fast and affordable. The Ultimate Shield package is great value for the price.', date: '2 weeks ago' },
+  { name: 'Sanket Gadkari', stars: 5, text: 'Friendly staff and spotless results every time. My go-to car wash in Harrison.', date: '3 weeks ago' },
+  { name: 'Shraddha Gohad', stars: 5, text: 'Love how easy it is to book online. The Works package keeps my car looking clean all week.', date: '1 month ago' },
 ]
 
 const GALLERY = [
@@ -15,25 +16,112 @@ const GALLERY = [
   { before: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=400&q=80', after: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=400&q=80', label: 'Toyota Fortuner' },
 ]
 
-function WaitTimeIndicator() {
-  const [wait, setWait] = useState(null)
+
+function CarSVG() {
+  return (
+    <svg width="110" height="48" viewBox="0 0 110 48" xmlns="http://www.w3.org/2000/svg">
+      {/* Shadow */}
+      <ellipse cx="55" cy="46" rx="46" ry="3" fill="black" fillOpacity="0.45" />
+      {/* Side skirt */}
+      <rect x="10" y="30" width="90" height="10" rx="2" fill="#990000" />
+      {/* Main body */}
+      <rect x="6" y="25" width="98" height="17" rx="4" fill="#CC0000" />
+      {/* Cabin — low sloped roofline */}
+      <path d="M24 25 L38 10 L72 9 L86 25Z" fill="#CC0000" />
+      {/* Darker roof panel */}
+      <path d="M30 24 L40 12 L71 11 L80 24Z" fill="#A80000" />
+      {/* Windshield — deeply raked */}
+      <path d="M42 23 L50 13 L69 12 L76 23Z" fill="#0a0a0a" fillOpacity="0.92" />
+      {/* Window divider */}
+      <line x1="58" y1="12" x2="58" y2="23" stroke="#880000" strokeWidth="1.5" />
+      {/* Front wheel */}
+      <circle cx="82" cy="39" r="10" fill="#111" />
+      <circle cx="82" cy="39" r="7" fill="#222" />
+      <line x1="82" y1="31" x2="82" y2="47" stroke="#999" strokeWidth="1.5" />
+      <line x1="74" y1="39" x2="90" y2="39" stroke="#999" strokeWidth="1.5" />
+      <line x1="76" y1="33" x2="88" y2="45" stroke="#777" strokeWidth="1" />
+      <line x1="88" y1="33" x2="76" y2="45" stroke="#777" strokeWidth="1" />
+      <circle cx="82" cy="39" r="2.5" fill="#bbb" />
+      {/* Rear wheel */}
+      <circle cx="28" cy="39" r="10" fill="#111" />
+      <circle cx="28" cy="39" r="7" fill="#222" />
+      <line x1="28" y1="31" x2="28" y2="47" stroke="#999" strokeWidth="1.5" />
+      <line x1="20" y1="39" x2="36" y2="39" stroke="#999" strokeWidth="1.5" />
+      <line x1="22" y1="33" x2="34" y2="45" stroke="#777" strokeWidth="1" />
+      <line x1="34" y1="33" x2="22" y2="45" stroke="#777" strokeWidth="1" />
+      <circle cx="28" cy="39" r="2.5" fill="#bbb" />
+      {/* Headlight */}
+      <rect x="103" y="26" width="5" height="5" rx="1.5" fill="white" fillOpacity="0.95" />
+      <rect x="103" y="32" width="5" height="3" rx="1" fill="#ffcc88" fillOpacity="0.7" />
+      {/* Taillight */}
+      <rect x="2" y="26" width="5" height="7" rx="1.5" fill="#ff3333" fillOpacity="0.9" />
+      {/* Front splitter */}
+      <rect x="103" y="36" width="6" height="2" rx="1" fill="#333" />
+      {/* Door line */}
+      <line x1="57" y1="25" x2="57" y2="37" stroke="#A80000" strokeWidth="1" strokeOpacity="0.5" />
+    </svg>
+  )
+}
+
+function ScrollCarPackages({ packages, monthly }) {
+  const ref = useRef(null)
+  const [progress, setProgress] = useState(0)
+
   useEffect(() => {
-    // Simulated live wait time — replace with real API call
-    const times = [5, 8, 12, 6, 10, 15, 7]
-    setWait(times[new Date().getMinutes() % times.length])
-    const interval = setInterval(() => {
-      setWait(times[Math.floor(Math.random() * times.length)])
-    }, 30000)
-    return () => clearInterval(interval)
+    const update = () => {
+      if (!ref.current) return
+      const rect = ref.current.getBoundingClientRect()
+      const vh = window.innerHeight
+      // 0 = section just entering viewport bottom, 1 = section top near viewport top
+      const p = Math.max(0, Math.min(1, (vh * 0.85 - rect.top) / (vh * 0.55)))
+      setProgress(p)
+    }
+    window.addEventListener('scroll', update, { passive: true })
+    update()
+    return () => window.removeEventListener('scroll', update)
   }, [])
 
-  const color = wait <= 8 ? 'text-green-400' : wait <= 15 ? 'text-yellow-400' : 'text-red-400'
+  const thresholds = [0.18, 0.38, 0.58, 0.78]
+  const visibleCount = thresholds.filter(t => progress >= t).length
+  const carPct = Math.min(91, Math.max(0, progress * 105))
 
   return (
-    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black-700 border border-white/10">
-      <span className={`w-2 h-2 rounded-full ${wait <= 8 ? 'bg-green-400' : wait <= 15 ? 'bg-yellow-400' : 'bg-red-400'} animate-pulse`} />
-      <span className="text-sm text-white/60">Current wait:</span>
-      <span className={`text-sm font-bold ${color}`}>{wait !== null ? `~${wait} min` : '...'}</span>
+    <div ref={ref}>
+      {/* Road */}
+      <div className="relative h-16 sm:h-20 bg-black-800 rounded-2xl overflow-hidden mb-8 border border-electric-500/20">
+        {/* Road edge lines */}
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-electric-500/20" />
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-electric-500/20" />
+        {/* Lane dashes */}
+        <div className="absolute top-1/2 left-4 right-4 -translate-y-0.5 flex items-center gap-3">
+          {Array.from({ length: 22 }).map((_, i) => (
+            <div key={i} className="h-0.5 w-8 bg-electric-400/25 shrink-0 rounded-full" />
+          ))}
+        </div>
+        {/* Car */}
+        <div
+          className="absolute top-1/2"
+          style={{ left: `${carPct}%`, transform: 'translate(-50%, -60%)', willChange: 'left' }}
+        >
+          <CarSVG />
+        </div>
+      </div>
+
+      {/* Package cards revealed one by one */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {packages.map((pkg, i) => (
+          <div
+            key={pkg.id}
+            style={{
+              opacity: i < visibleCount ? 1 : 0,
+              transform: i < visibleCount ? 'translateY(0)' : 'translateY(28px)',
+              transition: 'opacity 0.55s ease, transform 0.55s ease',
+            }}
+          >
+            <PackageCard pkg={pkg} monthly={monthly} featured={pkg.id === 'ultimate'} />
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -47,17 +135,18 @@ export default function Home() {
       {/* ─── Hero ─── */}
       <section className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-hidden pt-20">
         {/* Background */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_#D4AF3720_0%,_transparent_70%)]" />
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1592805144716-feeccccef5ac?w=1920&q=60')] bg-cover bg-center opacity-10" />
+        <div className="absolute inset-0 bg-hero-gradient" />
+        <div className="absolute inset-0 bg-hero-gradient2" />
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1592805144716-feeccccef5ac?w=1920&q=60')] bg-cover bg-center opacity-[0.06]" />
+        {/* Subtle grid overlay */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{backgroundImage: 'linear-gradient(#60a5fa 1px, transparent 1px), linear-gradient(90deg, #60a5fa 1px, transparent 1px)', backgroundSize: '60px 60px'}} />
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6">
-          <WaitTimeIndicator />
-
           <h1 className="mt-8 font-display text-5xl sm:text-6xl md:text-7xl font-bold leading-tight">
             Your Car Deserves<br />
             <span className="gold-text">the Royal Treatment</span>
           </h1>
-          <p className="mt-6 text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-6 text-lg text-electric-300/80 max-w-2xl mx-auto leading-relaxed">
             From quick exterior washes to full ceramic detailing — Wandile Car Wash delivers showroom-quality results every single time.
           </p>
 
@@ -73,9 +162,9 @@ export default function Home() {
           {/* Stats */}
           <div className="mt-16 grid grid-cols-3 gap-4 sm:gap-8 max-w-lg mx-auto">
             {[
-              { label: 'Cars Washed', value: '12,000+' },
-              { label: 'Happy Members', value: '1,400+' },
-              { label: 'Avg Rating', value: '4.9★' },
+              { label: 'Cars Washed', value: '0' },
+              { label: 'Happy Members', value: '6' },
+              { label: 'Avg Rating', value: '5.0★' },
             ].map(({ label, value }) => (
               <div key={label} className="text-center">
                 <div className="text-2xl font-bold gold-text">{value}</div>
@@ -98,17 +187,17 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
-              { icon: Zap, title: 'Fast & Efficient', desc: 'Most washes completed in under 15 minutes. We respect your time.' },
-              { icon: Shield, title: 'Paint Protection', desc: 'Soft-cloth technology that\'s gentle on your paint and clear coat.' },
-              { icon: Award, title: 'Quality Guaranteed', desc: '100% satisfaction guarantee. Not happy? We\'ll rewash for free.' },
-            ].map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="card-dark p-6 flex gap-4">
-                <div className="w-11 h-11 rounded-xl bg-gold-500/10 flex items-center justify-center shrink-0">
-                  <Icon size={22} className="text-gold-500" />
+              { icon: Zap, title: 'Fast & Efficient', desc: 'Most washes completed in under 15 minutes. We respect your time.', color: 'text-cyan-400', bg: 'bg-cyan-400/10' },
+              { icon: Shield, title: 'Paint Protection', desc: 'Soft-cloth technology that\'s gentle on your paint and clear coat.', color: 'text-electric-400', bg: 'bg-electric-400/10' },
+              { icon: Award, title: 'Quality Guaranteed', desc: '100% satisfaction guarantee. Not happy? We\'ll rewash for free.', color: 'text-gold-500', bg: 'bg-gold-500/10' },
+            ].map(({ icon: Icon, title, desc, color, bg }) => (
+              <div key={title} className="card-dark p-6 flex gap-4 hover:border-electric-400/30 transition-colors duration-300">
+                <div className={`w-11 h-11 rounded-xl ${bg} flex items-center justify-center shrink-0`}>
+                  <Icon size={22} className={color} />
                 </div>
                 <div>
                   <h3 className="font-semibold text-white mb-1">{title}</h3>
-                  <p className="text-sm text-white/50">{desc}</p>
+                  <p className="text-sm text-electric-300/60">{desc}</p>
                 </div>
               </div>
             ))}
@@ -143,11 +232,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {PACKAGES.map((pkg, i) => (
-              <PackageCard key={pkg.id} pkg={pkg} monthly={monthly} featured={pkg.id === 'ultimate'} />
-            ))}
-          </div>
+          <ScrollCarPackages packages={PACKAGES} monthly={monthly} />
 
           <div className="text-center mt-8">
             <Link to="/packages" className="btn-outline">
@@ -193,7 +278,7 @@ export default function Home() {
             <h2 className="text-4xl font-display font-bold mt-2">What Customers Say</h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {REVIEWS.map((r, i) => (
               <div key={i} className="card-dark p-6">
                 <div className="flex gap-0.5 mb-3">
@@ -201,7 +286,7 @@ export default function Home() {
                     <Star key={j} size={14} className="text-gold-500" fill="#D4AF37" />
                   ))}
                 </div>
-                <p className="text-sm text-white/70 mb-4 leading-relaxed">"{r.text}"</p>
+                <p className="text-sm text-electric-300/70 mb-4 leading-relaxed">"{r.text}"</p>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-white">{r.name}</p>
@@ -230,7 +315,7 @@ export default function Home() {
             <div className="rounded-2xl overflow-hidden border border-white/10 h-72 lg:h-80">
               <iframe
                 title="Wandile Car Wash Location"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3579.9!2d28.0473!3d-26.2041!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjbCsDEyJzE0LjgiUyAyOMKwMDInNTAuMyJF!5e0!3m2!1sen!2sza!4v1234567890"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.9!2d-74.1543!3d40.7448!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25469a4c93f1b%3A0x1!2s300+Somerset+St%2C+Harrison%2C+NJ!5e0!3m2!1sen!2sus!4v1234567890"
                 width="100%"
                 height="100%"
                 style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg)' }}
@@ -244,8 +329,8 @@ export default function Home() {
               <div className="flex items-start gap-3">
                 <MapPin size={18} className="text-gold-500 mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-medium text-white">123 Shine Street</p>
-                  <p className="text-sm text-white/50">Johannesburg, South Africa</p>
+                  <p className="font-medium text-white">300 Somerset St</p>
+                  <p className="text-sm text-white/50">Harrison, NJ</p>
                 </div>
               </div>
 
@@ -263,13 +348,6 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="border-t border-white/10 pt-4">
-                <div className="flex items-center gap-2 text-sm">
-                  <Clock size={14} className="text-gold-500" />
-                  <WaitTimeIndicator />
-                </div>
-              </div>
-
               <Link to="/book" className="btn-gold w-full">
                 Book an Appointment
               </Link>
@@ -279,16 +357,18 @@ export default function Home() {
       </section>
 
       {/* ─── CTA Banner ─── */}
-      <section className="py-16 section-padding bg-gold-gradient">
-        <div className="max-w-3xl mx-auto text-center">
-          <Droplets size={40} className="text-black mx-auto mb-4 opacity-60" />
-          <h2 className="text-4xl font-display font-bold text-black">Ready for a Shine?</h2>
-          <p className="text-black/60 mt-3 mb-8">Join 1,400+ happy members and keep your car sparkling year-round.</p>
+      <section className="py-16 section-padding bg-blue-gradient relative overflow-hidden">
+        {/* Shimmer overlay */}
+        <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'radial-gradient(circle at 30% 50%, white 0%, transparent 60%)'}} />
+        <div className="relative max-w-3xl mx-auto text-center">
+          <Droplets size={40} className="text-white mx-auto mb-4 opacity-70" />
+          <h2 className="text-4xl font-display font-bold text-white">Ready for a Shine?</h2>
+          <p className="text-white/70 mt-3 mb-8">Join our growing community and keep your car sparkling year-round.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link to="/signup" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-lg font-semibold bg-black text-gold-500 hover:bg-black/80 transition-colors">
+            <Link to="/signup" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-lg font-semibold bg-white text-blue-700 hover:bg-white/90 transition-colors shadow-lg">
               Create Free Account
             </Link>
-            <Link to="/book" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-lg font-semibold border-2 border-black/30 text-black hover:bg-black/10 transition-colors">
+            <Link to="/book" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-lg font-semibold border-2 border-white/40 text-white hover:bg-white/10 transition-colors">
               Book Now — No Account Needed
             </Link>
           </div>

@@ -2,8 +2,8 @@ export const PACKAGES = [
   {
     id: 'basic',
     name: 'Basic Wash',
-    price: 10,
-    monthlyPrice: 29,
+    price: 2,
+    monthlyPrice: 6,
     color: 'from-zinc-700 to-zinc-600',
     badge: null,
     features: [
@@ -16,8 +16,8 @@ export const PACKAGES = [
   {
     id: 'works',
     name: 'The Works',
-    price: 15,
-    monthlyPrice: 39,
+    price: 3,
+    monthlyPrice: 8,
     color: 'from-blue-900 to-blue-800',
     badge: 'Popular',
     features: [
@@ -31,8 +31,8 @@ export const PACKAGES = [
   {
     id: 'ultimate',
     name: 'Ultimate Shield',
-    price: 22,
-    monthlyPrice: 59,
+    price: 4,
+    monthlyPrice: 10,
     color: 'from-gold-800 to-gold-700',
     badge: 'Best Value',
     features: [
@@ -46,8 +46,8 @@ export const PACKAGES = [
   {
     id: 'ceramic',
     name: 'Full Ceramic Detail',
-    price: 45,
-    monthlyPrice: 99,
+    price: 5,
+    monthlyPrice: 13,
     color: 'from-black-500 to-black-400',
     badge: 'Premium',
     features: [

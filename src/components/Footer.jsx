@@ -3,7 +3,7 @@ import { Droplets, Phone, Mail, MapPin, Instagram, Facebook, Twitter } from 'luc
 
 export default function Footer() {
   return (
-    <footer className="bg-black-800 border-t border-white/10">
+    <footer className="bg-black-800 border-t border-electric-500/15">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
@@ -14,11 +14,11 @@ export default function Footer() {
               </div>
               <span className="font-display text-xl font-semibold gold-text">Wandile Car Wash</span>
             </div>
-            <p className="text-white/50 text-sm leading-relaxed">
+            <p className="text-electric-300/60 text-sm leading-relaxed">
               Premium car care with every wash. Your vehicle deserves the best.
             </p>
             <div className="flex gap-3 mt-4">
-              <a href="#" className="w-9 h-9 rounded-lg bg-white/5 hover:bg-gold-500/20 flex items-center justify-center transition-colors">
+              <a href="https://www.instagram.com/tejaswandile" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg bg-white/5 hover:bg-gold-500/20 flex items-center justify-center transition-colors">
                 <Instagram size={16} className="text-white/60" />
               </a>
               <a href="#" className="w-9 h-9 rounded-lg bg-white/5 hover:bg-gold-500/20 flex items-center justify-center transition-colors">
@@ -57,7 +57,7 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-white/50">
               <li className="flex items-start gap-2">
                 <MapPin size={14} className="text-gold-500 mt-0.5 shrink-0" />
-                <span>123 Shine Street, Johannesburg, ZA</span>
+                <span>300 Somerset St, Harrison, NJ</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone size={14} className="text-gold-500 shrink-0" />
@@ -75,7 +75,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/30">
+        <div className="mt-10 pt-6 border-t border-electric-500/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-electric-300/40">
           <p>© {new Date().getFullYear()} Wandile Car Wash. All rights reserved.</p>
           <div className="flex gap-4">
             <a href="#" className="hover:text-white/60">Privacy Policy</a>
